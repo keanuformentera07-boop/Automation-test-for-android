@@ -1,0 +1,80 @@
+ Node.js implementation using built-in assert module for test cases
+ Target environment Node.js 24
+
+const assert = require('assert');
+
+
+  Simulates a login system.
+ 
+class AuthService {
+    constructor() {
+         Mock database
+        this.validUser = rregual@uspf.edu.ph;
+        this.validPass = secret123;
+    }
+
+    
+      Authenticates a user.
+      @param {string} username 
+      @param {string} password 
+      @returns {object} Result object with success status and message
+     
+    login(username, password) {
+        if (!username  !password) {
+            return { success false, message Username and password are required. };
+        }
+
+        if (username === this.validUser && password === this.validPass) {
+            return { success true, message Login successful! };
+        } else if (username !== this.validUser) {
+            return { success false, message Wrong username. };
+        } else {
+            return { success false, message Wrong password. };
+        }
+    }
+}
+
+ ==========================================
+ Test Cases
+ ==========================================
+function runTests() {
+    const auth = new AuthService();
+    console.log(Running Authentication Test Cases...n);
+
+     Test 1 Correct login
+    try {
+        const result = auth.login(rregual@uspf.edu.ph, secret123);
+        assert.strictEqual(result.success, true);
+        assert.strictEqual(result.message, Login successful!);
+        console.log(✅ Test 1 Passed Correct login);
+    } catch (error) {
+        console.error(❌ Test 1 Failed Correct login, error.message);
+    }
+
+     Test 2 Wrong username
+    try {
+        const result = auth.login(wrong_user, secret123);
+        assert.strictEqual(result.success, false);
+        assert.strictEqual(result.message, Wrong username.);
+        console.log(✅ Test 2 Passed Wrong user);
+    } catch (error) {
+        console.error(❌ Test 2 Failed Wrong user, error.message);
+    }
+
+     Test 3 Wrong password
+    try {
+        const result = auth.login(rregual@uspf.edu.ph, wrong_password);
+        assert.strictEqual(result.success, false);
+        assert.strictEqual(result.message, Wrong password.);
+        console.log(✅ Test 3 Passed Wrong password);
+    } catch (error) {
+        console.error(❌ Test 3 Failed Wrong password, error.message);
+    }
+}
+
+ Execute tests if run directly
+if (require.main === module) {
+    runTests();
+}
+
+module.exports = AuthService;
