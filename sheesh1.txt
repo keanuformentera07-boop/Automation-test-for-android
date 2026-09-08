@@ -1,80 +1,102 @@
- Node.js implementation using built-in assert module for test cases
- Target environment Node.js 24
+package pages;
 
-const assert = require('assert');
+import io.appium.java_client.AppiumBy;
+import io.appium.java_client.android.AndroidDriver;
+import org.openqa.selenium.By;
 
+public class LoginPage {
+    private final AndroidDriver driver;
 
-  Simulates a login system.
- 
-class AuthService {
-    constructor() {
-         Mock database
-        this.validUser = rregual@uspf.edu.ph;
-        this.validPass = secret123;
+    // --- Locators ---
+    // Update the resource-id strings to match your target app's accessibility IDs or resource IDs
+    private final By usernameField = AppiumBy.accessibilityId("username_input");
+    private final By passwordField = AppiumBy.accessibilityId("password_input");
+    private final By loginButton   = AppiumBy.accessibilityId("login_button");
+
+    // Constructor
+    public LoginPage(AndroidDriver driver) {
+        this.driver = driver;
     }
 
-    
-      Authenticates a user.
-      @param {string} username 
-      @param {string} password 
-      @returns {object} Result object with success status and message
-     
-    login(username, password) {
-        if (!username  !password) {
-            return { success false, message Username and password are required. };
+    // --- Actions ---
+    public LoginPage enterUsername(String username) {
+        driver.findElement(usernameField).clear();
+        driver.findElement(usernameField).sendKeys(username);
+        return this;
+    }
+
+    public LoginPage enterPassword(String password) {
+        driver.findElement(passwordField).clear();
+        driver.findElement(passwordField).sendKeys(password);
+        return this;
+    }
+
+    public void clickLogin() {
+        driver.findElement(loginButton).click();
+    }
+
+    public void login(String username, String password) {
+        enterUsername(username);
+        enterPassword(password);
+        clickLogin();
+    }
+}
+
+package tests;
+
+import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.android.options.UiAutomator2Options;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import pages.LoginPage;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.time.Duration;
+
+public class LoginTest {
+
+    private AndroidDriver driver;
+    private LoginPage loginPage;
+
+    @BeforeEach
+    public void setUp() throws MalformedURLException {
+        UiAutomator2Options options = new UiAutomator2Options();
+        
+        // --- Capabilities Configuration ---
+        options.setPlatformName("Android");
+        options.setAutomationName("UiAutomator2");
+        options.setDeviceName("Android Emulator"); // or your connected device ID
+        
+        // Option A: Pointing directly to your APK
+        options.setApp("/path/to/your/app-debug.apk");
+        
+        // Option B: Pointing to an already installed app
+        // options.setAppPackage("com.example.myapp");
+        // options.setAppActivity("com.example.myapp.MainActivity");
+
+        // Connect to Appium Server
+        driver = new AndroidDriver(new URL("http://127.0.0.1:4723/"), options);
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+
+        loginPage = new LoginPage(driver);
+    }
+
+    @Test
+    public void testSuccessfulLogin() {
+        // Execute login sequence
+        loginPage.enterUsername("testuser@example.com")
+                 .enterPassword("SecurePassword123")
+                 .clickLogin();
+
+        // Add assertions here based on your app (e.g., verify welcome message or dashboard element)
+    }
+
+    @AfterEach
+    public void tearDown() {
+        if (driver != null) {
+            driver.quit();
         }
-
-        if (username === this.validUser && password === this.validPass) {
-            return { success true, message Login successful! };
-        } else if (username !== this.validUser) {
-            return { success false, message Wrong username. };
-        } else {
-            return { success false, message Wrong password. };
-        }
     }
 }
-
- ==========================================
- Test Cases
- ==========================================
-function runTests() {
-    const auth = new AuthService();
-    console.log(Running Authentication Test Cases...n);
-
-     Test 1 Correct login
-    try {
-        const result = auth.login(rregual@uspf.edu.ph, secret123);
-        assert.strictEqual(result.success, true);
-        assert.strictEqual(result.message, Login successful!);
-        console.log(✅ Test 1 Passed Correct login);
-    } catch (error) {
-        console.error(❌ Test 1 Failed Correct login, error.message);
-    }
-
-     Test 2 Wrong username
-    try {
-        const result = auth.login(wrong_user, secret123);
-        assert.strictEqual(result.success, false);
-        assert.strictEqual(result.message, Wrong username.);
-        console.log(✅ Test 2 Passed Wrong user);
-    } catch (error) {
-        console.error(❌ Test 2 Failed Wrong user, error.message);
-    }
-
-     Test 3 Wrong password
-    try {
-        const result = auth.login(rregual@uspf.edu.ph, wrong_password);
-        assert.strictEqual(result.success, false);
-        assert.strictEqual(result.message, Wrong password.);
-        console.log(✅ Test 3 Passed Wrong password);
-    } catch (error) {
-        console.error(❌ Test 3 Failed Wrong password, error.message);
-    }
-}
-
- Execute tests if run directly
-if (require.main === module) {
-    runTests();
-}
-
-module.exports = AuthService;
